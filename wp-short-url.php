@@ -59,37 +59,49 @@ class WP_Short_URLs {
 	}
 	
 	public static function wp_ajax_add_short_url(){
-		$origin = preg_replace("/[^a-z0-9$-_.+!*'(),]+/i", "", $_POST['origin']);
-		if(strpos($origin, '/') === false){
-			$origin = '/'.$origin;
-		}
-		$destination = $_POST['destination'];
-		
-		$short_urls = get_option(self::OPTIONS_KEY, array());
-		if(in_array($origin, array_keys($short_urls))){
+		if(!isset($_POST['origin']) || !isset($_POST['destination'])){
 			$response = new WP_Ajax_Response(array(
 				'what' => 'wp_short_url',
 				'action' => 'add_short_url',
 				'id' => 0,
 				'position' => 1,
-				'data' => new WP_Error('shorturl_already_exists', 'There is already a short URL defined for the requested origin.')
+				'data' => new WP_Error('required_fields', 'Both fields are required.')
 			));
 			$response->send();
 		}
-		
-		$short_urls[$origin] = $destination;
-		update_option(self::OPTIONS_KEY, $short_urls);
-		
-		$row = sprintf('<tr><th class="check-column tbody-child"><input type="checkbox" class="bulk_actions_check" data-origin="%s" /></th><td><a href="%s" target="_blank">%s</a></td><td><a href="%s" target="_blank">%s</a></td></tr>', $origin, site_url($origin), site_url($origin), $destination, $destination);
-		$response = new WP_Ajax_Response(array(
-			'what' => 'wp_short_url',
-			'action' => 'add_short_url',
-			'id' => 1,
-			'position' => 1,
-			'data' => 'success',
-			'supplemental' => array('row' => $row)
-		));
-		$response->send();
+		if(isset($_REQUEST['add_short_url_nonce']) && wp_verify_nonce($_REQUEST['add_short_url_nonce'], 'add_new_short_url')) {
+			$origin = preg_replace("/[^a-z0-9$-_.+!*'(),]+/i", "", $_POST['origin']);
+			if(strpos($origin, '/') === false){
+				$origin = '/'.$origin;
+			}
+			$destination = $_POST['destination'];
+
+			$short_urls = get_option(self::OPTIONS_KEY, array());
+			if(in_array($origin, array_keys($short_urls))){
+				$response = new WP_Ajax_Response(array(
+					'what' => 'wp_short_url',
+					'action' => 'add_short_url',
+					'id' => 0,
+					'position' => 1,
+					'data' => new WP_Error('shorturl_already_exists', 'There is already a short URL defined for the requested origin.')
+				));
+				$response->send();
+			}
+
+			$short_urls[$origin] = $destination;
+			update_option(self::OPTIONS_KEY, $short_urls);
+
+			$row = sprintf('<tr><th class="check-column tbody-child"><input type="checkbox" class="bulk_actions_check" data-origin="%s" /></th><td><a href="%s" target="_blank">%s</a></td><td><a href="%s" target="_blank">%s</a></td></tr>', $origin, site_url($origin), site_url($origin), $destination, $destination);
+			$response = new WP_Ajax_Response(array(
+				'what' => 'wp_short_url',
+				'action' => 'add_short_url',
+				'id' => 1,
+				'position' => 1,
+				'data' => 'success',
+				'supplemental' => array('row' => $row)
+			));
+			$response->send();
+		}
 	}
 	
 	public static function add_options_page(){
@@ -151,6 +163,7 @@ class WP_Short_URLs {
 						<div class="form-wrap">
 							<h3>Add New Short URL</h3>
 							<form id="add-short-url" method="post">
+								<?php wp_nonce_field('add_new_short_url', 'add_short_url_nonce'); ?>
 								<input type="hidden" id="action" name="action" value="add_short_url"/>
 								<div class="form-field form-required">
 									<label for="origin">Origin URL</label>
