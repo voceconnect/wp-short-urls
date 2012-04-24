@@ -26,3 +26,6 @@ This section describes how to install the plugin and get it working.
 
 = 0.1 =
 * First Version
+
+= 0.2 =
+* Adding nonce fields

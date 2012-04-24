@@ -3,7 +3,7 @@
 Plugin Name: WP Short URLs
 Plugin URI: http://voceconnect.com
 Description: 
-Version: 0.1
+Version: 0.2
 Author: Kevin Langley
 Author URI: http://voceconnect.com
 License: GPLv2 or later
