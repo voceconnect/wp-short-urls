@@ -5,7 +5,7 @@ jQuery(function($){
 	var destination = $('#destination');
 	var origin = $('#origin');
 	
-	container.delegate('#doaction', 'click', function(e){
+	$('#doaction').on('click', function(e){
 		var del = [];
 		var data;
 		var checked = $('.tbody-child input[type="checkbox"]:checked');
@@ -26,7 +26,7 @@ jQuery(function($){
 		});
 	});
 	
-	container.delegate('#submit', 'click', function(e){
+	$('#submit').on('click', function(e){
 		var form = $(this).parents('form');
 		var errors = [];
 		
@@ -63,9 +63,6 @@ jQuery(function($){
 		e.preventDefault();
 		return false;
 	});
-	
-	
-	
 	
 	function is_valid_url(str) {
 		var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/

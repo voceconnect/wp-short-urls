@@ -39,7 +39,7 @@ class WP_Short_URLs {
 	}
 	
 	public static function wp_ajax_delete_bulk_short_urls(){
-		$del_short_urls = $_POST['shorturls'];
+		$del_short_urls = ( isset($_REQUEST['shorturls']) && !empty($_REQUEST['shorturls'])) ? $_REQUEST['shorturls'] : '';
 		$short_urls = get_option(self::OPTIONS_KEY, array());
 		foreach($del_short_urls as $del){
 			if(in_array($del, array_keys($short_urls))){
@@ -59,7 +59,7 @@ class WP_Short_URLs {
 	}
 	
 	public static function wp_ajax_add_short_url(){
-		if(!isset($_POST['origin']) || !isset($_POST['destination'])){
+		if(!isset($_REQUEST['origin']) || !isset($_REQUEST['destination'])){
 			$response = new WP_Ajax_Response(array(
 				'what' => 'wp_short_url',
 				'action' => 'add_short_url',
@@ -70,11 +70,11 @@ class WP_Short_URLs {
 			$response->send();
 		}
 		if(isset($_REQUEST['add_short_url_nonce']) && wp_verify_nonce($_REQUEST['add_short_url_nonce'], 'add_new_short_url')) {
-			$origin = preg_replace("/[^a-z0-9$-_.+!*'(),]+/i", "", $_POST['origin']);
+			$origin = preg_replace("/[^a-z0-9$-_.+!*'(),]+/i", "", $_REQUEST['origin']);
 			if(strpos($origin, '/') === false){
 				$origin = '/'.$origin;
 			}
-			$destination = $_POST['destination'];
+			$destination = $_REQUEST['destination'];
 
 			$short_urls = get_option(self::OPTIONS_KEY, array());
 			if(in_array($origin, array_keys($short_urls))){
