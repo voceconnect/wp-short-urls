@@ -15,14 +15,9 @@ class WP_Short_URLs {
 	
 	public static function init(){
 		add_action('admin_menu', array(__CLASS__, 'add_options_page'));
-		add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
 		add_action('wp_ajax_add_short_url', array(__CLASS__, 'wp_ajax_add_short_url'));
 		add_action('wp_ajax_delete_bulk_short_urls', array(__CLASS__, 'wp_ajax_delete_bulk_short_urls'));
 		self::check_redirect();
-	}
-	
-	public static function enqueue_scripts(){
-		wp_enqueue_script('wp-short-url', plugins_url('js/wp-short-url.js', __FILE__), array('jquery', 'wp-ajax-response'));
 	}
 	
 	public static function check_redirect(){
@@ -59,7 +54,7 @@ class WP_Short_URLs {
 	}
 	
 	public static function wp_ajax_add_short_url(){
-		if(!isset($_REQUEST['origin']) || !isset($_REQUEST['destination'])){
+		if(!isset($_REQUEST['origin']) || empty($_REQUEST['origin']) || !isset($_REQUEST['destination']) || empty($_REQUEST['destination'])){
 			$response = new WP_Ajax_Response(array(
 				'what' => 'wp_short_url',
 				'action' => 'add_short_url',
@@ -105,7 +100,10 @@ class WP_Short_URLs {
 	}
 	
 	public static function add_options_page(){
-		add_menu_page(__('WP Short URLs', 'wp_short_urls'), __('Short URLs', 'wp_short_urls'), 'manage_options', 'wp-short-url', array(__CLASS__, 'wp_shorturl_page'));
+		$page = add_menu_page(__('WP Short URLs', 'wp_short_urls'), __('Short URLs', 'wp_short_urls'), 'manage_options', 'wp-short-url', array(__CLASS__, 'wp_shorturl_page'));
+		add_action( 'admin_print_styles-'.$page, function(){
+			wp_enqueue_script('wp-short-url', plugins_url('js/wp-short-url.js', __FILE__), array('jquery', 'wp-ajax-response'));
+		});
 	}
 	
 	public static function wp_shorturl_page(){ 
@@ -181,6 +179,7 @@ class WP_Short_URLs {
 					</div>
 				</div>
 			</div>
+		</div>
 	<?php
 	}
 	
