@@ -34,6 +34,9 @@ class WP_Short_URLs {
 	}
 	
 	public static function wp_ajax_delete_bulk_short_urls(){
+		if(!current_user_can( 'manage_shorturls')) {
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+		}
 		$del_short_urls = ( isset($_REQUEST['shorturls']) && !empty($_REQUEST['shorturls'])) ? $_REQUEST['shorturls'] : '';
 		$short_urls = get_option(self::OPTIONS_KEY, array());
 		foreach($del_short_urls as $del){
@@ -54,6 +57,9 @@ class WP_Short_URLs {
 	}
 	
 	public static function wp_ajax_add_short_url(){
+		if(!current_user_can( 'manage_shorturls')) {
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+		}
 		if(!isset($_REQUEST['origin']) || empty($_REQUEST['origin']) || !isset($_REQUEST['destination']) || empty($_REQUEST['destination'])){
 			$response = new WP_Ajax_Response(array(
 				'what' => 'wp_short_url',
@@ -100,15 +106,18 @@ class WP_Short_URLs {
 	}
 	
 	public static function add_options_page(){
-		$page = add_menu_page(__('WP Short URLs', 'wp_short_urls'), __('Short URLs', 'wp_short_urls'), 'manage_options', 'wp-short-url', array(__CLASS__, 'wp_shorturl_page'));
+		$page = add_menu_page(__('WP Short URLs', 'wp_short_urls'), __('Short URLs', 'wp_short_urls'), 'manage_shorturls', 'wp-short-url', array(__CLASS__, 'wp_shorturl_page'));
 		add_action( 'admin_print_styles-'.$page, function(){
 			wp_enqueue_script('wp-short-url', plugins_url('js/wp-short-url.js', __FILE__), array('jquery', 'wp-ajax-response'));
 		});
 	}
 	
 	public static function wp_shorturl_page(){ 
+		if(!current_user_can( 'manage_shorturls')) {
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+		}
 		$short_urls = get_option(self::OPTIONS_KEY, array());
-	?>
+		?>
 		<div class="wrap">
 			<div id="icon-settings" class="icon32 icon-settings"><br></div>
 			<h2>WP Short URLs</h2>
