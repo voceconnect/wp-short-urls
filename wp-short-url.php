@@ -153,13 +153,18 @@ class WP_Short_URLs {
 									</tr>
 								</tfoot>
 								<tbody>
-									<?php foreach($short_urls as $origin => $destination): ?>
+									<?php if(count($short_urls)): foreach($short_urls as $origin => $destination): ?>
 									<tr>
 										<th class="check-column tbody-child"><input type="checkbox" class="bulk_actions_check" data-origin="<?php echo esc_attr($origin); ?>" /></th>
 										<td><?php printf('<a href="%s" target="_blank">%s</a>', site_url($origin), site_url($origin)); ?></td>
 										<td><?php printf('<a href="%s" target="_blank">%s</a>', esc_attr($destination), $destination); ?></td>
 									</tr>
 									<?php endforeach; ?>
+									<?php else: ?>
+									<tr>
+										<td colspan="3">There are currently no Short URLs defined.</td>
+									</tr>
+									<?php endif; ?>
 								</tbody>
 							</table>
 						</form>
